@@ -1,0 +1,3550 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "2025-04-15T08:32:20Z",
+    "title": "tm3-restaurant_api-sam5"
+  },
+  "host": "3rh91vhdtj.execute-api.eu-west-3.amazonaws.com",
+  "basePath": "/api",
+  "schemes": [
+    "https"
+  ],
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "JWT Authorization header using the Bearer scheme. Example: 'Authorization: Bearer {token}'"
+    }
+  },
+  "paths": {
+    "/auth/sign-in": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "User sign-in",
+        "description": "Authenticates a user and returns an access token",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "User login credentials",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "email",
+                "password"
+              ],
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "format": "email"
+                },
+                "password": {
+                  "type": "string",
+                  "format": "password"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful authentication",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "accessToken": {
+                  "type": "string",
+                  "description": "JWT token for authentication"
+                },
+                "refreshToken": {
+                  "type": "string",
+                  "description": "Token used to get a new access token"
+                },
+                "user": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string"
+                    },
+                    "firstName": {
+                      "type": "string"
+                    },
+                    "lastName": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string",
+                      "enum": [
+                        "CLIENT",
+                        "WAITER",
+                        "ADMIN"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                "user": {
+                  "id": "user-123",
+                  "email": "john.doe@example.com",
+                  "firstName": "John",
+                  "lastName": "Doe",
+                  "role": "CLIENT"
+                }
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "type": "string"
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication failed",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "message": "Invalid email or password"
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "httpMethod": "POST",
+          "uri": "arn:aws:apigateway:eu-west-3:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-3:089718700404:function:tm3-api-handler-sam5/invocations",
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "type": "aws_proxy"
+        }
+      }
+    },
+    "/auth/sign-up": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "User registration",
+        "description": "Registers a new user account",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "User registration details",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "firstName",
+                "lastName",
+                "email",
+                "password"
+              ],
+              "properties": {
+                "firstName": {
+                  "type": "string",
+                  "example": "John"
+                },
+                "lastName": {
+                  "type": "string",
+                  "example": "Doe"
+                },
+                "email": {
+                  "type": "string",
+                  "format": "email",
+                  "example": "john.doe@example.com"
+                },
+                "password": {
+                  "type": "string",
+                  "format": "password",
+                  "example": "SecurePassword123!"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "schema": {
+              "$ref": "#/definitions/Empty"
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "httpMethod": "POST",
+          "uri": "arn:aws:apigateway:eu-west-3:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-3:089718700404:function:tm3-api-handler-sam5/invocations",
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "type": "aws_proxy"
+        }
+      }
+    },
+    "/bookings/client": {
+      "post": {
+        "tags": [
+          "Bookings"
+        ],
+        "summary": "orders a table by client (Sprint 1: User Story 6)",
+        "description": "This endpoint books a table",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Reservation request",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "locationId": {
+                  "type": "string",
+                  "example": "672846d5c951184d705b65d7"
+                },
+                "tableNumber": {
+                  "type": "string",
+                  "example": "1"
+                },
+                "date": {
+                  "type": "string",
+                  "format": "date",
+                  "example": "2021-12-31"
+                },
+                "guestsNumber": {
+                  "type": "string",
+                  "example": "4"
+                },
+                "timeFrom": {
+                  "type": "string",
+                  "example": "12:15"
+                },
+                "timeTo": {
+                  "type": "string",
+                  "example": "14:00"
+                }
+              },
+              "required": [
+                "locationId",
+                "tableNumber",
+                "date",
+                "guestsNumber",
+                "timeFrom",
+                "timeTo"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "locationAddress": {
+                  "type": "string"
+                },
+                "date": {
+                  "type": "string"
+                },
+                "timeSlot": {
+                  "type": "string"
+                },
+                "preOrder": {
+                  "type": "string"
+                },
+                "guestsNumber": {
+                  "type": "string"
+                },
+                "feedbackId": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "id": "res-12345",
+                "status": "CONFIRMED",
+                "locationAddress": "123 Main Street, New York, NY 10001",
+                "date": "2021-12-31",
+                "timeSlot": "12:15 - 14:00",
+                "preOrder": "None",
+                "guestsNumber": "4",
+                "feedbackId": ""
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "type": "string"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Authentication token is missing or invalid",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Unauthorized"
+                }
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "httpMethod": "POST",
+          "uri": "arn:aws:apigateway:eu-west-3:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-3:089718700404:function:tm3-api-handler-sam5/invocations",
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "type": "aws_proxy"
+        }
+      }
+    },
+    "/bookings/tables": {
+      "get": {
+        "tags": [
+          "Bookings"
+        ],
+        "summary": "returns a list of available tables (Sprint 1: User Story 5)",
+        "description": "This endpoint returns a list of tables available for booking",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "locationId",
+            "in": "query",
+            "description": "Location ID (e.g., 672846d5c951184d705b65d7)",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "description": "Date (e.g., 2024-08-01)",
+            "required": false,
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "name": "time",
+            "in": "query",
+            "description": "Time (e.g., 12:00)",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "guests",
+            "in": "query",
+            "description": "Number of guests (e.g., 4)",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "locationId": {
+                    "type": "string"
+                  },
+                  "locationAddress": {
+                    "type": "string"
+                  },
+                  "tableNumber": {
+                    "type": "string"
+                  },
+                  "capacity": {
+                    "type": "string"
+                  },
+                  "availableSlots": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "httpMethod": "POST",
+          "uri": "arn:aws:apigateway:eu-west-3:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-3:089718700404:function:tm3-api-handler-sam5/invocations",
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "type": "aws_proxy"
+        }
+      }
+    },
+    "/bookings/waiter": {
+      "post": {
+        "tags": [
+          "Waiters"
+        ],
+        "summary": "assigns a waiter to a booking",
+        "description": "This endpoint assigns a waiter to a booking. It requires authentication with appropriate permissions.",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Booking details for waiter assignment",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "clientType": {
+                  "type": "string",
+                  "description": "Type of client",
+                  "enum": [
+                    "VISITOR",
+                    "REGISTERED"
+                  ],
+                  "example": "VISITOR"
+                },
+                "customerName": {
+                  "type": "string",
+                  "description": "Name of the customer",
+                  "example": "gaurav"
+                },
+                "date": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Date of the booking (YYYY-MM-DD)",
+                  "example": "2025-04-19"
+                },
+                "guestsNumber": {
+                  "type": "string",
+                  "description": "Number of guests",
+                  "example": "4"
+                },
+                "locationId": {
+                  "type": "string",
+                  "description": "ID of the restaurant location",
+                  "example": "location-001"
+                },
+                "tableNumber": {
+                  "type": "string",
+                  "description": "Table number for the booking",
+                  "example": "table-101"
+                },
+                "timeFrom": {
+                  "type": "string",
+                  "description": "Start time of the booking (HH:MM)",
+                  "example": "10:30"
+                },
+                "timeTo": {
+                  "type": "string",
+                  "description": "End time of the booking (HH:MM)",
+                  "example": "12:00"
+                }
+              },
+              "required": [
+                "clientType",
+                "customerName",
+                "date",
+                "guestsNumber",
+                "locationId",
+                "tableNumber",
+                "timeFrom",
+                "timeTo"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Waiter successfully assigned to booking",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Booking successfully created"
+                },
+                "bookingId": {
+                  "type": "string",
+                  "example": "booking-12345"
+                },
+                "customerName": {
+                  "type": "string",
+                  "example": "gaurav"
+                },
+                "date": {
+                  "type": "string",
+                  "format": "date",
+                  "example": "2025-04-19"
+                },
+                "timeSlot": {
+                  "type": "string",
+                  "example": "10:30 - 12:00"
+                },
+                "tableNumber": {
+                  "type": "string",
+                  "example": "table-101"
+                },
+                "locationId": {
+                  "type": "string",
+                  "example": "location-001"
+                },
+                "guestsNumber": {
+                  "type": "string",
+                  "example": "4"
+                }
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid input",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Invalid input data"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Authentication token is missing or invalid",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User does not have permission to create bookings",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Insufficient permissions to create bookings"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found - Location or table not found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Location or table not found"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict - Table already booked for this time slot",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Table already booked for this time slot"
+                }
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "httpMethod": "POST",
+          "uri": "arn:aws:apigateway:eu-west-3:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-3:089718700404:function:tm3-api-handler-sam5/invocations",
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "type": "aws_proxy"
+        }
+      }
+    },
+    "/bookings/waiter/{Id}": {
+      "put": {
+        "tags": [
+          "Waiters"
+        ],
+        "summary": "assigns a waiter to a booking",
+        "description": "This endpoint assigns a waiter to a specific booking. It requires authentication with appropriate permissions.",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "description": "ID of the booking to assign a waiter to",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Booking details for waiter assignment",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "date": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Date of the booking (YYYY-MM-DD)",
+                  "example": "2025-04-24"
+                },
+                "timeFrom": {
+                  "type": "string",
+                  "description": "Start time of the booking (HH:MM)",
+                  "example": "10:30"
+                },
+                "timeTo": {
+                  "type": "string",
+                  "description": "End time of the booking (HH:MM)",
+                  "example": "12:00"
+                },
+                "tableNumber": {
+                  "type": "string",
+                  "description": "Table number for the booking",
+                  "example": "table104"
+                }
+              },
+              "required": [
+                "date",
+                "timeFrom",
+                "timeTo",
+                "tableNumber"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Waiter successfully assigned to booking",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Waiter successfully assigned to booking"
+                },
+                "bookingId": {
+                  "type": "string"
+                },
+                "date": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "timeSlot": {
+                  "type": "string",
+                  "example": "10:30 - 12:00"
+                },
+                "tableNumber": {
+                  "type": "string"
+                }
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid input",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Invalid input data"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Authentication token is missing or invalid",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Unauthorized"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found - Booking or table not found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Booking or table not found"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict - Table already booked for this time slot",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Table already booked for this time slot"
+                }
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "httpMethod": "POST",
+          "uri": "arn:aws:apigateway:eu-west-3:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-3:089718700404:function:tm3-api-handler-sam5/invocations",
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "type": "aws_proxy"
+        }
+      }
+    },
+    "/dishes": {
+      "get": {
+        "tags": [
+          "Dishes"
+        ],
+        "summary": "returns list of dishes",
+        "description": "This endpoint returns a list of all available dishes with filtering and sorting options",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "dishType",
+            "in": "query",
+            "description": "Filter dishes by type",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sort dishes by field and direction",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "content": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                },
+                "totalElements": {
+                  "type": "integer"
+                },
+                "totalPages": {
+                  "type": "integer"
+                },
+                "size": {
+                  "type": "integer"
+                },
+                "number": {
+                  "type": "integer"
+                }
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "httpMethod": "POST",
+          "uri": "arn:aws:apigateway:eu-west-3:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-3:089718700404:function:tm3-api-handler-sam5/invocations",
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "type": "aws_proxy"
+        }
+      }
+    },
+    "/dishes/popular": {
+      "get": {
+        "tags": [
+          "Dishes"
+        ],
+        "summary": "returns popular dishes",
+        "description": "This endpoint returns a list of the most popular dishes",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of popular dishes successfully retrieved",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "price": {
+                    "type": "string"
+                  },
+                  "previewImageUrl": {
+                    "type": "string"
+                  },
+                  "weight": {
+                    "type": "string"
+                  },
+                  "popularity": {
+                    "type": "number"
+                  },
+                  "dishType": {
+                    "type": "string",
+                    "enum": [
+                      "APPETIZER",
+                      "MAIN_COURSE",
+                      "DESSERT",
+                      "DRINK"
+                    ]
+                  }
+                }
+              }
+            },
+            "examples": {
+              "application/json": [
+                {
+                  "id": "dish-123",
+                  "name": "Fresh Strawberry Mint Salad",
+                  "description": "A refreshing salad with fresh strawberries and mint",
+                  "price": "$12",
+                  "previewImageUrl": "https://green-and-tasty.s3.eu-central-1.amazonaws.com/img/ff7863bf-63eb-4f2e-8041-75a81507acff.jpg",
+                  "weight": "430 g",
+                  "popularity": 4.8,
+                  "dishType": "APPETIZER"
+                },
+                {
+                  "id": "dish-456",
+                  "name": "Grilled Salmon with Asparagus",
+                  "description": "Fresh salmon fillet grilled to perfection with asparagus",
+                  "price": "$24",
+                  "previewImageUrl": "https://green-and-tasty.s3.eu-central-1.amazonaws.com/img/salmon-asparagus.jpg",
+                  "weight": "380 g",
+                  "popularity": 4.7,
+                  "dishType": "MAIN_COURSE"
+                },
+                {
+                  "id": "dish-789",
+                  "name": "Chocolate Lava Cake",
+                  "description": "Warm chocolate cake with a molten chocolate center",
+                  "price": "$9",
+                  "previewImageUrl": "https://green-and-tasty.s3.eu-central-1.amazonaws.com/img/lava-cake.jpg",
+                  "weight": "220 g",
+                  "popularity": 4.9,
+                  "dishType": "DESSERT"
+                }
+              ]
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "httpMethod": "POST",
+          "uri": "arn:aws:apigateway:eu-west-3:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-3:089718700404:function:tm3-api-handler-sam5/invocations",
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "type": "aws_proxy"
+        }
+      }
+    },
+    "/dishes/{id}": {
+      "get": {
+        "tags": [
+          "Dishes"
+        ],
+        "summary": "returns a specific dish by ID",
+        "description": "This endpoint returns detailed information about a specific dish identified by its ID",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Unique identifier of the dish",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dish details successfully retrieved",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "price": {
+                  "type": "string"
+                },
+                "ingredients": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "nutritionalInfo": {
+                  "type": "object",
+                  "properties": {
+                    "calories": {
+                      "type": "string"
+                    },
+                    "protein": {
+                      "type": "string"
+                    },
+                    "carbs": {
+                      "type": "string"
+                    },
+                    "fat": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "allergens": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "imageUrls": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "previewImageUrl": {
+                  "type": "string"
+                },
+                "weight": {
+                  "type": "string"
+                },
+                "preparationTime": {
+                  "type": "string"
+                },
+                "dishType": {
+                  "type": "string",
+                  "enum": [
+                    "APPETIZER",
+                    "MAIN_COURSE",
+                    "DESSERT",
+                    "DRINK"
+                  ]
+                },
+                "popularity": {
+                  "type": "number"
+                },
+                "reviews": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "rating": {
+                        "type": "number"
+                      },
+                      "comment": {
+                        "type": "string"
+                      },
+                      "author": {
+                        "type": "string"
+                      },
+                      "date": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "id": "dish-123",
+                "name": "Fresh Strawberry Mint Salad",
+                "description": "A refreshing salad with fresh strawberries and mint, topped with balsamic glaze and feta cheese. Perfect as a light appetizer or side dish.",
+                "price": "$12",
+                "ingredients": [
+                  "Fresh strawberries",
+                  "Mint leaves",
+                  "Mixed greens",
+                  "Feta cheese",
+                  "Balsamic glaze",
+                  "Olive oil",
+                  "Salt and pepper"
+                ],
+                "nutritionalInfo": {
+                  "calories": "230 kcal",
+                  "protein": "5g",
+                  "carbs": "18g",
+                  "fat": "16g"
+                },
+                "allergens": [
+                  "Dairy"
+                ],
+                "imageUrls": [
+                  "https://green-and-tasty.s3.eu-central-1.amazonaws.com/img/ff7863bf-63eb-4f2e-8041-75a81507acff.jpg",
+                  "https://green-and-tasty.s3.eu-central-1.amazonaws.com/img/strawberry-salad-2.jpg",
+                  "https://green-and-tasty.s3.eu-central-1.amazonaws.com/img/strawberry-salad-3.jpg"
+                ],
+                "previewImageUrl": "https://green-and-tasty.s3.eu-central-1.amazonaws.com/img/ff7863bf-63eb-4f2e-8041-75a81507acff.jpg",
+                "weight": "430 g",
+                "preparationTime": "15 min",
+                "dishType": "APPETIZER",
+                "popularity": 4.8,
+                "reviews": [
+                  {
+                    "rating": 5,
+                    "comment": "Absolutely delicious! The strawberries were so fresh.",
+                    "author": "Jane D.",
+                    "date": "2024-03-15"
+                  },
+                  {
+                    "rating": 4,
+                    "comment": "Great combination of flavors. Would order again.",
+                    "author": "Michael S.",
+                    "date": "2024-02-28"
+                  }
+                ]
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "type": "string"
+              }
+            }
+          },
+          "404": {
+            "description": "Dish not found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "message": "Dish with ID 'dish-123' not found"
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "httpMethod": "POST",
+          "uri": "arn:aws:apigateway:eu-west-3:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-3:089718700404:function:tm3-api-handler-sam5/invocations",
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "type": "aws_proxy"
+        }
+      }
+    },
+    "/feedbacks": {
+      "get": {
+        "tags": [
+          "Feedbacks"
+        ],
+        "summary": "returns list of feedbacks",
+        "description": "This endpoint returns a list of all feedbacks with pagination and filtering options",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Filter feedbacks by type",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "Cuisine",
+              "Service",
+              "Ambiance",
+              "Value",
+              "Overall"
+            ]
+          },
+          {
+            "name": "locationId",
+            "in": "query",
+            "description": "Filter feedbacks by location ID",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number for pagination",
+            "required": false,
+            "type": "integer",
+            "default": 0
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Number of items per page",
+            "required": false,
+            "type": "integer",
+            "default": 20
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "content": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "rate": {
+                        "type": "string"
+                      },
+                      "comment": {
+                        "type": "string"
+                      },
+                      "userName": {
+                        "type": "string"
+                      },
+                      "userAvatarUrl": {
+                        "type": "string"
+                      },
+                      "date": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string"
+                      },
+                      "locationId": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "totalPages": {
+                  "type": "integer"
+                },
+                "totalElements": {
+                  "type": "integer"
+                },
+                "size": {
+                  "type": "integer"
+                },
+                "number": {
+                  "type": "integer"
+                },
+                "sort": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "direction": {
+                        "type": "string"
+                      },
+                      "property": {
+                        "type": "string"
+                      },
+                      "ignoreCase": {
+                        "type": "boolean"
+                      },
+                      "nullHandling": {
+                        "type": "string"
+                      },
+                      "ascending": {
+                        "type": "boolean"
+                      }
+                    }
+                  }
+                },
+                "first": {
+                  "type": "boolean"
+                },
+                "last": {
+                  "type": "boolean"
+                },
+                "numberOfElements": {
+                  "type": "integer"
+                },
+                "pageable": {
+                  "type": "object",
+                  "properties": {
+                    "offset": {
+                      "type": "integer"
+                    },
+                    "sort": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "direction": {
+                            "type": "string"
+                          },
+                          "property": {
+                            "type": "string"
+                          },
+                          "ignoreCase": {
+                            "type": "boolean"
+                          },
+                          "nullHandling": {
+                            "type": "string"
+                          },
+                          "ascending": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    },
+                    "pageNumber": {
+                      "type": "integer"
+                    },
+                    "pageSize": {
+                      "type": "integer"
+                    },
+                    "paged": {
+                      "type": "boolean"
+                    },
+                    "unpaged": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "empty": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "httpMethod": "POST",
+          "uri": "arn:aws:apigateway:eu-west-3:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-3:089718700404:function:tm3-api-handler-sam5/invocations",
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "type": "aws_proxy"
+        }
+      },
+      "post": {
+        "tags": [
+          "Feedbacks"
+        ],
+        "summary": "creates a new feedback",
+        "description": "This endpoint allows users to submit a new feedback",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Feedback object that needs to be submitted",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "rate",
+                "type",
+                "locationId"
+              ],
+              "properties": {
+                "rate": {
+                  "type": "string",
+                  "description": "Rating value (1-5)"
+                },
+                "comment": {
+                  "type": "string",
+                  "description": "User's comment"
+                },
+                "type": {
+                  "type": "string",
+                  "description": "Type of feedback",
+                  "enum": [
+                    "Cuisine",
+                    "Service",
+                    "Ambiance",
+                    "Value",
+                    "Overall"
+                  ]
+                },
+                "locationId": {
+                  "type": "string",
+                  "description": "ID of the restaurant location"
+                },
+                "reservationId": {
+                  "type": "string",
+                  "description": "ID of the reservation (optional)"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Feedback created successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Authentication token is missing or invalid",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Location not found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "httpMethod": "POST",
+          "uri": "arn:aws:apigateway:eu-west-3:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-3:089718700404:function:tm3-api-handler-sam5/invocations",
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "type": "aws_proxy"
+        }
+      }
+    },
+    "/feedbacks/{id}": {
+      "get": {
+        "tags": [
+          "Feedbacks"
+        ],
+        "summary": "returns a specific feedback by ID",
+        "description": "This endpoint returns detailed information about a specific feedback identified by its ID",
+        "produces": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Unique identifier of the feedback",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Feedback details successfully retrieved",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "reservationId": {
+                  "type": "string"
+                },
+                "customerId": {
+                  "type": "string"
+                },
+                "customerName": {
+                  "type": "string"
+                },
+                "rating": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 5
+                },
+                "comment": {
+                  "type": "string"
+                },
+                "serviceRating": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 5
+                },
+                "foodRating": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 5
+                },
+                "ambienceRating": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 5
+                },
+                "visitDate": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "locationId": {
+                  "type": "string"
+                },
+                "locationName": {
+                  "type": "string"
+                },
+                "photos": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "response": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string"
+                    },
+                    "respondentName": {
+                      "type": "string"
+                    },
+                    "respondentRole": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "id": "feedback-123",
+                "reservationId": "res-456",
+                "customerId": "user-789",
+                "customerName": "John Doe",
+                "rating": 4.5,
+                "comment": "We had a wonderful dining experience. The food was excellent and the service was attentive. The only small issue was that it was a bit noisy, but overall we had a great time and will definitely return.",
+                "serviceRating": 5,
+                "foodRating": 5,
+                "ambienceRating": 3.5,
+                "visitDate": "2024-04-15",
+                "createdAt": "2024-04-16T10:30:00Z",
+                "locationId": "loc-101",
+                "locationName": "Green & Tasty Downtown",
+                "photos": [
+                  "https://green-and-tasty.s3.eu-central-1.amazonaws.com/feedback/img123.jpg",
+                  "https://green-and-tasty.s3.eu-central-1.amazonaws.com/feedback/img456.jpg"
+                ],
+                "response": {
+                  "text": "Thank you for your wonderful feedback, John! We're delighted you enjoyed the food and service. We're working on improving the acoustics to address the noise level. We look forward to welcoming you back soon!",
+                  "respondentName": "Sarah Johnson",
+                  "respondentRole": "Restaurant Manager",
+                  "createdAt": "2024-04-17T09:15:00Z"
+                }
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "type": "string"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Authentication token is missing or invalid",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "message": "Unauthorized: Valid authentication token is required"
+              }
+            }
+          },
+          "404": {
+            "description": "Feedback not found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "message": "Feedback with ID 'feedback-123' not found"
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "httpMethod": "POST",
+          "uri": "arn:aws:apigateway:eu-west-3:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-3:089718700404:function:tm3-api-handler-sam5/invocations",
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "type": "aws_proxy"
+        }
+      }
+    },
+    "/locations": {
+      "get": {
+        "tags": [
+          "Locations"
+        ],
+        "summary": "returns list of locations (Sprint 1: User Story 4)",
+        "description": "This endpoint returns a list of locations",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "address": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "totalCapacity": {
+                    "type": "string"
+                  },
+                  "averageOccupancy": {
+                    "type": "string"
+                  },
+                  "imageUrl": {
+                    "type": "string"
+                  },
+                  "rating": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "httpMethod": "POST",
+          "uri": "arn:aws:apigateway:eu-west-3:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-3:089718700404:function:tm3-api-handler-sam5/invocations",
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "type": "aws_proxy"
+        }
+      }
+    },
+    "/locations/select-options": {
+      "get": {
+        "tags": [
+          "Locations"
+        ],
+        "summary": "returns location options for selection dropdowns",
+        "description": "This endpoint returns a simplified list of locations suitable for dropdown menus and selection components",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of location options successfully retrieved",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "Unique identifier of the location"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Display name of the location"
+                  },
+                  "address": {
+                    "type": "string",
+                    "description": "Short address of the location"
+                  }
+                }
+              }
+            },
+            "examples": {
+              "application/json": [
+                {
+                  "id": "location-1",
+                  "name": "Green & Tasty Downtown",
+                  "address": "123 Main Street, New York, NY"
+                },
+                {
+                  "id": "location-2",
+                  "name": "Green & Tasty Beachside",
+                  "address": "456 Ocean Drive, Miami, FL"
+                },
+                {
+                  "id": "location-3",
+                  "name": "Green & Tasty Uptown",
+                  "address": "789 Park Avenue, New York, NY"
+                },
+                {
+                  "id": "location-4",
+                  "name": "Green & Tasty Riverside",
+                  "address": "321 River Road, Chicago, IL"
+                }
+              ]
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "httpMethod": "POST",
+          "uri": "arn:aws:apigateway:eu-west-3:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-3:089718700404:function:tm3-api-handler-sam5/invocations",
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "type": "aws_proxy"
+        }
+      }
+    },
+    "/locations/{id}/feedbacks": {
+      "get": {
+        "tags": [
+          "Feedbacks"
+        ],
+        "summary": "returns feedbacks for a restaurant location",
+        "description": "This endpoint returns feedbacks for a restaurant location",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id of the restaurant location",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Type of feedback",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "Cuisine",
+              "Service"
+            ]
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Zero-based page index (0..N)",
+            "required": false,
+            "type": "integer",
+            "default": 0
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "The size of the page to be returned",
+            "required": false,
+            "type": "integer",
+            "default": 20
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "totalPages": {
+                  "type": "integer"
+                },
+                "totalElements": {
+                  "type": "integer"
+                },
+                "size": {
+                  "type": "integer"
+                },
+                "content": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "rate": {
+                        "type": "string"
+                      },
+                      "comment": {
+                        "type": "string"
+                      },
+                      "userName": {
+                        "type": "string"
+                      },
+                      "userAvatarUrl": {
+                        "type": "string"
+                      },
+                      "date": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string"
+                      },
+                      "locationId": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "number": {
+                  "type": "integer"
+                },
+                "sort": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "direction": {
+                        "type": "string"
+                      },
+                      "nullHandling": {
+                        "type": "string"
+                      },
+                      "ascending": {
+                        "type": "boolean"
+                      },
+                      "property": {
+                        "type": "string"
+                      },
+                      "ignoreCase": {
+                        "type": "boolean"
+                      }
+                    }
+                  }
+                },
+                "first": {
+                  "type": "boolean"
+                },
+                "last": {
+                  "type": "boolean"
+                },
+                "numberOfElements": {
+                  "type": "integer"
+                },
+                "pageable": {
+                  "type": "object",
+                  "properties": {
+                    "offset": {
+                      "type": "integer"
+                    },
+                    "sort": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "direction": {
+                            "type": "string"
+                          },
+                          "nullHandling": {
+                            "type": "string"
+                          },
+                          "ascending": {
+                            "type": "boolean"
+                          },
+                          "property": {
+                            "type": "string"
+                          },
+                          "ignoreCase": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    },
+                    "paged": {
+                      "type": "boolean"
+                    },
+                    "pageSize": {
+                      "type": "integer"
+                    },
+                    "pageNumber": {
+                      "type": "integer"
+                    },
+                    "unpaged": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "empty": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "httpMethod": "POST",
+          "uri": "arn:aws:apigateway:eu-west-3:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-3:089718700404:function:tm3-api-handler-sam5/invocations",
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "type": "aws_proxy"
+        }
+      }
+    },
+    "/locations/{id}/speciality-dishes": {
+      "get": {
+        "tags": [
+          "Locations"
+        ],
+        "summary": "returns specialty dishes for a specific location",
+        "description": "This endpoint returns a list of specialty dishes that are unique or signature items for a specific restaurant location",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Unique identifier of the location",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of specialty dishes successfully retrieved",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "price": {
+                    "type": "string"
+                  },
+                  "previewImageUrl": {
+                    "type": "string"
+                  },
+                  "chefNote": {
+                    "type": "string"
+                  },
+                  "isSignature": {
+                    "type": "boolean"
+                  },
+                  "isSeasonalSpecial": {
+                    "type": "boolean"
+                  },
+                  "dishType": {
+                    "type": "string",
+                    "enum": [
+                      "APPETIZER",
+                      "MAIN_COURSE",
+                      "DESSERT",
+                      "DRINK"
+                    ]
+                  },
+                  "popularity": {
+                    "type": "number"
+                  },
+                  "availableSince": {
+                    "type": "string",
+                    "format": "date"
+                  }
+                }
+              }
+            },
+            "examples": {
+              "application/json": [
+                {
+                  "id": "dish-567",
+                  "name": "Downtown Truffle Risotto",
+                  "description": "Creamy arborio rice cooked with wild mushrooms and finished with black truffle shavings",
+                  "price": "$28",
+                  "previewImageUrl": "https://green-and-tasty.s3.eu-central-1.amazonaws.com/img/truffle-risotto.jpg",
+                  "chefNote": "Our signature dish created by Chef Marco using locally foraged mushrooms and imported Italian truffles",
+                  "isSignature": true,
+                  "isSeasonalSpecial": false,
+                  "dishType": "MAIN_COURSE",
+                  "popularity": 4.9,
+                  "availableSince": "2022-05-15"
+                },
+                {
+                  "id": "dish-568",
+                  "name": "Downtown Citrus Tart",
+                  "description": "Tangy lemon and lime tart with a buttery shortbread crust and torched meringue topping",
+                  "price": "$12",
+                  "previewImageUrl": "https://green-and-tasty.s3.eu-central-1.amazonaws.com/img/citrus-tart.jpg",
+                  "chefNote": "A refreshing dessert that perfectly balances sweet and tart flavors",
+                  "isSignature": true,
+                  "isSeasonalSpecial": false,
+                  "dishType": "DESSERT",
+                  "popularity": 4.7,
+                  "availableSince": "2022-06-10"
+                },
+                {
+                  "id": "dish-569",
+                  "name": "Summer Berry Gazpacho",
+                  "description": "Chilled soup made with fresh summer berries, cucumber, and herbs",
+                  "price": "$14",
+                  "previewImageUrl": "https://green-and-tasty.s3.eu-central-1.amazonaws.com/img/berry-gazpacho.jpg",
+                  "chefNote": "A unique seasonal special perfect for hot summer days",
+                  "isSignature": false,
+                  "isSeasonalSpecial": true,
+                  "dishType": "APPETIZER",
+                  "popularity": 4.6,
+                  "availableSince": "2024-06-01"
+                }
+              ]
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "type": "string"
+              }
+            }
+          },
+          "404": {
+            "description": "Location not found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "message": "Location with ID 'location-1' not found"
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "httpMethod": "POST",
+          "uri": "arn:aws:apigateway:eu-west-3:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-3:089718700404:function:tm3-api-handler-sam5/invocations",
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "type": "aws_proxy"
+        }
+      }
+    },
+    "/locations/{id}/tables": {
+      "get": {
+        "tags": [
+          "Locations"
+        ],
+        "summary": "returns tables for a specific location",
+        "description": "This endpoint returns a list of all tables available at a specific restaurant location",
+        "produces": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Unique identifier of the location",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of tables successfully retrieved",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "tableNumber": {
+                    "type": "string"
+                  },
+                  "capacity": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "section": {
+                    "type": "string",
+                    "enum": [
+                      "INDOOR",
+                      "OUTDOOR",
+                      "BALCONY",
+                      "PRIVATE"
+                    ]
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "AVAILABLE",
+                      "OCCUPIED",
+                      "RESERVED",
+                      "MAINTENANCE"
+                    ]
+                  },
+                  "shape": {
+                    "type": "string",
+                    "enum": [
+                      "ROUND",
+                      "RECTANGULAR",
+                      "SQUARE",
+                      "OVAL"
+                    ]
+                  },
+                  "positionX": {
+                    "type": "integer",
+                    "description": "X-coordinate for table positioning on floor plan"
+                  },
+                  "positionY": {
+                    "type": "integer",
+                    "description": "Y-coordinate for table positioning on floor plan"
+                  },
+                  "isAccessible": {
+                    "type": "boolean",
+                    "description": "Whether the table is wheelchair accessible"
+                  },
+                  "minReservationTime": {
+                    "type": "integer",
+                    "description": "Minimum reservation time in minutes"
+                  },
+                  "maxReservationTime": {
+                    "type": "integer",
+                    "description": "Maximum reservation time in minutes"
+                  }
+                }
+              }
+            },
+            "examples": {
+              "application/json": [
+                {
+                  "id": "table-101",
+                  "tableNumber": "1",
+                  "capacity": 2,
+                  "section": "INDOOR",
+                  "status": "AVAILABLE",
+                  "shape": "ROUND",
+                  "positionX": 10,
+                  "positionY": 15,
+                  "isAccessible": true,
+                  "minReservationTime": 60,
+                  "maxReservationTime": 120
+                },
+                {
+                  "id": "table-102",
+                  "tableNumber": "2",
+                  "capacity": 4,
+                  "section": "INDOOR",
+                  "status": "RESERVED",
+                  "shape": "RECTANGULAR",
+                  "positionX": 25,
+                  "positionY": 15,
+                  "isAccessible": true,
+                  "minReservationTime": 60,
+                  "maxReservationTime": 180
+                },
+                {
+                  "id": "table-103",
+                  "tableNumber": "3",
+                  "capacity": 6,
+                  "section": "OUTDOOR",
+                  "status": "AVAILABLE",
+                  "shape": "RECTANGULAR",
+                  "positionX": 40,
+                  "positionY": 30,
+                  "isAccessible": true,
+                  "minReservationTime": 90,
+                  "maxReservationTime": 180
+                },
+                {
+                  "id": "table-104",
+                  "tableNumber": "4",
+                  "capacity": 8,
+                  "section": "PRIVATE",
+                  "status": "AVAILABLE",
+                  "shape": "OVAL",
+                  "positionX": 60,
+                  "positionY": 45,
+                  "isAccessible": false,
+                  "minReservationTime": 120,
+                  "maxReservationTime": 240
+                }
+              ]
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "type": "string"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Authentication token is missing or invalid",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "message": "Unauthorized"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User does not have permission to view tables",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "message": "Access denied: Insufficient permissions"
+              }
+            }
+          },
+          "404": {
+            "description": "Location not found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "message": "Location with ID 'location-1' not found"
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "httpMethod": "POST",
+          "uri": "arn:aws:apigateway:eu-west-3:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-3:089718700404:function:tm3-api-handler-sam5/invocations",
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "type": "aws_proxy"
+        }
+      }
+    },
+    "/reservations": {
+      "get": {
+        "tags": [
+          "Reservations"
+        ],
+        "summary": "returns list of reservations for the logged-in user",
+        "description": "This endpoint returns a list of all reservations for the authenticated user. Authentication token is required.",
+        "produces": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string"
+                  },
+                  "locationId": {
+                    "type": "string"
+                  },
+                  "locationAddress": {
+                    "type": "string"
+                  },
+                  "date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "timeSlot": {
+                    "type": "string"
+                  },
+                  "guestsNumber": {
+                    "type": "string"
+                  },
+                  "tableNumber": {
+                    "type": "string"
+                  },
+                  "preOrder": {
+                    "type": "string"
+                  },
+                  "feedbackId": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "examples": {
+              "application/json": [
+                {
+                  "id": "res-12345",
+                  "status": "Reserved",
+                  "locationId": "location-001",
+                  "locationAddress": "123 Main Street, New York, NY 10001",
+                  "date": "2023-08-15",
+                  "timeSlot": "18:30 - 20:00",
+                  "guestsNumber": "4",
+                  "tableNumber": "12",
+                  "preOrder": "None",
+                  "feedbackId": ""
+                },
+                {
+                  "id": "res-67890",
+                  "status": "Finished",
+                  "locationId": "location-002",
+                  "locationAddress": "456 Park Avenue, New York, NY 10022",
+                  "date": "2023-07-20",
+                  "timeSlot": "19:00 - 21:00",
+                  "guestsNumber": "2",
+                  "tableNumber": "5",
+                  "preOrder": "None",
+                  "feedbackId": "feedback-123"
+                }
+              ]
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "type": "string"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Authentication token is missing or invalid",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Unauthorized"
+                }
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "httpMethod": "POST",
+          "uri": "arn:aws:apigateway:eu-west-3:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-3:089718700404:function:tm3-api-handler-sam5/invocations",
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "type": "aws_proxy"
+        }
+      }
+    },
+    "/reservations/{id}": {
+      "put": {
+        "tags": [
+          "Reservations"
+        ],
+        "summary": "updates an existing reservation",
+        "description": "This endpoint updates an existing reservation by its ID",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Reservation ID to update",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Updated reservation details",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "date": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "guestsNumber": {
+                  "type": "string"
+                },
+                "timeFrom": {
+                  "type": "string"
+                },
+                "timeTo": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "CONFIRMED",
+                    "CANCELLED",
+                    "PENDING"
+                  ]
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reservation updated successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "locationAddress": {
+                  "type": "string"
+                },
+                "date": {
+                  "type": "string"
+                },
+                "timeSlot": {
+                  "type": "string"
+                },
+                "guestsNumber": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "id": "res-12345",
+                "status": "CONFIRMED",
+                "locationAddress": "123 Main Street, New York, NY 10001",
+                "date": "2024-08-15",
+                "timeSlot": "18:30 - 20:00",
+                "guestsNumber": "6"
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid input",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Authentication token is missing or invalid",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Reservation not found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "httpMethod": "POST",
+          "uri": "arn:aws:apigateway:eu-west-3:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-3:089718700404:function:tm3-api-handler-sam5/invocations",
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "type": "aws_proxy"
+        }
+      },
+      "delete": {
+        "tags": [
+          "Reservations"
+        ],
+        "summary": "cancels or deletes a reservation",
+        "description": "This endpoint allows users to cancel their reservation. Authentication is required and users can only cancel their own reservations unless they have admin privileges.",
+        "produces": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the reservation to cancel",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reservation successfully cancelled",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Reservation successfully cancelled"
+                },
+                "id": {
+                  "type": "string",
+                  "description": "ID of the cancelled reservation"
+                }
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid reservation ID format",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Invalid reservation ID format"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Authentication token is missing or invalid",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User does not have permission to cancel this reservation",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "You do not have permission to cancel this reservation"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found - Reservation not found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Reservation not found"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict - Reservation cannot be cancelled (e.g., too close to reservation time)",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Reservation cannot be cancelled less than 2 hours before the scheduled time"
+                }
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "httpMethod": "POST",
+          "uri": "arn:aws:apigateway:eu-west-3:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-3:089718700404:function:tm3-api-handler-sam5/invocations",
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "type": "aws_proxy"
+        }
+      }
+    },
+    "/user": {
+      "delete": {
+        "tags": [
+          "User"
+        ],
+        "summary": "deletes the current user's account",
+        "description": "This endpoint permanently deletes the account of the currently authenticated user",
+        "produces": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User account successfully deleted",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "message": "User account successfully deleted"
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "type": "string"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Authentication token is missing or invalid",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "message": "Unauthorized"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Cannot delete account with active reservations",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "message": "Cannot delete account with active reservations"
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "httpMethod": "POST",
+          "uri": "arn:aws:apigateway:eu-west-3:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-3:089718700404:function:tm3-api-handler-sam5/invocations",
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "type": "aws_proxy"
+        }
+      }
+    },
+    "/users/profile": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "returns profile information for the logged-in user",
+        "description": "This endpoint returns profile information for the authenticated user. Authentication token is required.",
+        "produces": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "User ID"
+                },
+                "firstName": {
+                  "type": "string",
+                  "description": "User's first name"
+                },
+                "lastName": {
+                  "type": "string",
+                  "description": "User's last name"
+                },
+                "email": {
+                  "type": "string",
+                  "format": "email",
+                  "description": "User's email address"
+                },
+                "phoneNumber": {
+                  "type": "string",
+                  "description": "User's phone number"
+                },
+                "role": {
+                  "type": "string",
+                  "description": "User's role in the system",
+                  "enum": [
+                    "CLIENT",
+                    "WAITER",
+                    "ADMIN"
+                  ]
+                },
+                "avatarUrl": {
+                  "type": "string",
+                  "description": "URL to user's avatar image"
+                },
+                "preferences": {
+                  "type": "object",
+                  "description": "User preferences",
+                  "properties": {
+                    "favoriteLocations": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "IDs of user's favorite restaurant locations"
+                    },
+                    "dietaryRestrictions": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "User's dietary restrictions"
+                    },
+                    "notificationsEnabled": {
+                      "type": "boolean",
+                      "description": "Whether notifications are enabled for this user"
+                    }
+                  }
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "When the user account was created"
+                },
+                "lastLogin": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "When the user last logged in"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "id": "user-12345",
+                "firstName": "John",
+                "lastName": "Doe",
+                "email": "john.doe@example.com",
+                "phoneNumber": "+1-555-123-4567",
+                "role": "CLIENT",
+                "avatarUrl": "https://example.com/avatars/johndoe.jpg",
+                "preferences": {
+                  "favoriteLocations": [
+                    "location-001",
+                    "location-003"
+                  ],
+                  "dietaryRestrictions": [
+                    "Vegetarian",
+                    "Gluten-free"
+                  ],
+                  "notificationsEnabled": true
+                },
+                "createdAt": "2023-01-15T10:30:00Z",
+                "lastLogin": "2023-08-20T18:45:22Z"
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "type": "string"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Authentication token is missing or invalid",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Unauthorized"
+                }
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "httpMethod": "POST",
+          "uri": "arn:aws:apigateway:eu-west-3:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-3:089718700404:function:tm3-api-handler-sam5/invocations",
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "type": "aws_proxy"
+        }
+      },
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "updates profile information for the logged-in user",
+        "description": "This endpoint updates profile information for the authenticated user. Authentication token is required.",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Updated user profile information",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "firstName": {
+                  "type": "string",
+                  "description": "User's first name"
+                },
+                "lastName": {
+                  "type": "string",
+                  "description": "User's last name"
+                },
+                "phoneNumber": {
+                  "type": "string",
+                  "description": "User's phone number"
+                },
+                "preferences": {
+                  "type": "object",
+                  "properties": {
+                    "favoriteLocations": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "dietaryRestrictions": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "notificationsEnabled": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Profile updated successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Profile updated successfully"
+                }
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid input data",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Invalid input data"
+                },
+                "errors": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Authentication token is missing or invalid",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Unauthorized"
+                }
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "httpMethod": "POST",
+          "uri": "arn:aws:apigateway:eu-west-3:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-3:089718700404:function:tm3-api-handler-sam5/invocations",
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "type": "aws_proxy"
+        }
+      }
+    },
+    "/waiter/reservations": {
+      "get": {
+        "tags": [
+          "Waiter"
+        ],
+        "summary": "returns reservations for waiters",
+        "description": "This endpoint returns a list of reservations assigned to the authenticated waiter",
+        "produces": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "table",
+            "in": "query",
+            "description": "Table identifier (e.g., table-102)",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "description": "Filter reservations by date (e.g., 2025-04-25)",
+            "required": false,
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "name": "time",
+            "in": "query",
+            "description": "Filter reservations by time (e.g., 10:30)",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter reservations by status",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "CONFIRMED",
+              "CANCELLED",
+              "COMPLETED",
+              "IN_PROGRESS"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of reservations successfully retrieved",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "tableNumber": {
+                    "type": "string"
+                  },
+                  "customerName": {
+                    "type": "string"
+                  },
+                  "date": {
+                    "type": "string"
+                  },
+                  "timeSlot": {
+                    "type": "string"
+                  },
+                  "guestsNumber": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string"
+                  },
+                  "specialRequests": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "examples": {
+              "application/json": [
+                {
+                  "id": "res-12345",
+                  "tableNumber": "table-102",
+                  "customerName": "John Doe",
+                  "date": "2025-04-25",
+                  "timeSlot": "10:30 - 12:30",
+                  "guestsNumber": "4",
+                  "status": "CONFIRMED",
+                  "specialRequests": "Window seat preferred"
+                },
+                {
+                  "id": "res-12346",
+                  "tableNumber": "table-103",
+                  "customerName": "Jane Smith",
+                  "date": "2025-04-25",
+                  "timeSlot": "11:00 - 13:00",
+                  "guestsNumber": "6",
+                  "status": "IN_PROGRESS",
+                  "specialRequests": "Birthday celebration"
+                }
+              ]
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required parameters",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "message": "time can't be empty"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Authentication token is missing or invalid",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "message": "Unauthorized"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User does not have waiter role",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "message": "Access denied: Waiter role required"
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "httpMethod": "POST",
+          "uri": "arn:aws:apigateway:eu-west-3:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-3:089718700404:function:tm3-api-handler-sam5/invocations",
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "type": "aws_proxy"
+        }
+      }
+    },
+    "/waiter/{id}": {
+      "delete": {
+        "tags": [
+          "Waiters"
+        ],
+        "summary": "deletes a specific waiter",
+        "description": "This endpoint removes a waiter from the system. This may be a soft delete that changes their status to TERMINATED rather than completely removing the record.",
+        "produces": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Unique identifier of the waiter to delete",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Waiter successfully deleted",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "message": "Waiter successfully deleted"
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "type": "string"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Authentication token is missing or invalid",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "message": "Unauthorized"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User does not have permission to delete waiters",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "message": "Access denied: Admin role required"
+              }
+            }
+          },
+          "404": {
+            "description": "Waiter not found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "message": "Waiter with ID 'waiter-123' not found"
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict - Waiter has active assignments",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "message": "Cannot delete waiter with active assignments"
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "httpMethod": "POST",
+          "uri": "arn:aws:apigateway:eu-west-3:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-3:089718700404:function:tm3-api-handler-sam5/invocations",
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "type": "aws_proxy"
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Empty": {
+      "type": "object",
+      "title": "Empty Schema"
+    }
+  }
+}

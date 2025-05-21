@@ -1,0 +1,100 @@
+## [1.1.1] – 2025-05-05
+ 
+### Description
+🚀 **Sprint 3: Hybrid Infrastructure Transition**  
+To address infrastructure cost spikes from rising user activity, we initiated the migration to **Kubernetes**, starting with the **synchronous API handler**. This sprint also formalized backend modernization using **Spring Boot 3 + Spring Security**, with an AI-generated blueprint to bootstrap the development process.
+ 
+### Added
+ 
+#### ☸️ Kubernetes Migration 
+- ✅ Migrated synchronous API handler to Kubernetes.
+- 📦 Helm charts implemented with HPA-based autoscaling.
+- 🔐 Environment configuration secured via Kubernetes Secrets and ConfigMaps.
+- 🌐 Ingress controller (ALB) integrated for external access.
+ 
+#### 🤖 AI-Assisted Project Blueprint 
+- ⚙️ Spring Boot 3 backend project structure generated via AI:
+  - Clean modular architecture
+  - Layered separation (controller, service, repository)
+  - Predefined REST patterns and security hooks
+- 🔧 Profiles for `local`, `staging`, `production`.
+ 
+#### 🔐 Spring Boot 3 & Spring Security Integration
+- ⬆️ Upgraded backend to Spring Boot 3.
+- 🛡️ Role-based authentication & authorization (`Customer`, `Waiter`, `Visitor`).
+- 🔐 JWT-based stateless security layer.
+ 
+### Changed
+ 
+- 🔄 API Gateway updated to forward traffic to Kubernetes LoadBalancer endpoint.
+- ⚙️ CI/CD pipelines (GitHub Actions) updated for container builds and Helm deployments.
+- 📈 Enhanced structured logging with Pod-level metadata via CloudWatch Agent.
+ 
+### Removed
+ 
+- ❌ Deprecated legacy Lambda-based synchronous handler.
+- 🧹 Removed obsolete shell scripts for local testing (migrated to K8s-native workflows).
+ 
+---
+ 
+## [1.1.0] – 2025-04-15
+ 
+### Description
+🚧 **Sprint 2: MVP Delivery**  
+Introduced key systems for **Reporting**, **Order Management**, and **Feedback**. Integrated AWS EventBridge, SQS, SES, and Lambdas to drive automation and customer interaction.
+ 
+### Added
+ 
+#### 📊 Reporting System (US_8)
+- 🕒 Automated reporting for reservations, orders, and user activity.
+- 🧱 Infra components:
+  - `Reports` table (DynamoDB)
+  - `Reports Handler` & `Sender` Lambdas
+  - EventBridge cron scheduler
+  - Email notifications via SES
+ 
+#### 🧾 Order Management
+- 🛍️ Pre-ordering via API (US_10)
+- 🧑‍🍳 Waiter-linked order management via secure APIs (US_13)
+ 
+#### 🗣️ Feedback System
+- 🌟 Customer post-visit feedback (US_15)
+- 🙈 Anonymous QR-based feedback (US_11)
+ 
+#### 👤 Profile Management
+- 🔄 Authenticated API for user profile updates (US_14)
+ 
+### Changed
+- 🗃️ Schema extensions for `Orders`, `Feedback`, and `Reports` tables.
+- 🔁 Updated Cognito attribute mapping for new user profile fields.
+ 
+### Removed
+- 🧽 Cleared unused frontend UI components (moved to backlog).
+- 📤 Deprecated manual reporting (replaced by EventBridge → SES automation).
+ 
+---
+ 
+## [1.0.0] – 2025-04-05
+ 
+### Description
+🧱 **Sprint 1: Foundation Setup**  
+Established core platform infrastructure with a focus on **User Management**, **Reservations**, and **AWS Serverless** backbone.
+ 
+### Added
+ 
+#### 👥 User Management
+- ✅ Cognito-based Registration (US_1) and Login (US_2)
+- 🧑‍🔧 Role assignment post-registration (`Customer`, `Waiter`, `Visitor`) (US_3)
+ 
+#### 📍 Reservation System
+- 🪑 Users can:
+  - View table details (US_4)
+  - Browse availability (US_5)
+  - Make reservations (US_6)
+- 🗄️ Data persisted in DynamoDB
+- ⚙️ APIs exposed via API Gateway + Lambda
+ 
+#### ☁️ Infrastructure
+- 🌐 Static frontend hosting (S3)
+- 🔐 Secured backend APIs (IAM, Lambda)
+- 📊 Monitoring setup via CloudWatch
