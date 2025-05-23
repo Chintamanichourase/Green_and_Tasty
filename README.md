@@ -1,77 +1,88 @@
-# 🌱 Green and Tasty - Cloud-Native Restaurant Platform
+# 🌱 Green and Tasty - Scalable Restaurant Management Platform
 
-A highly scalable, cloud-native restaurant reservation and management system built with microservices architecture. Designed to handle real-time operations like table reservations, menu viewing, waiter assignments, and user feedback — the project has grown from a monolithic AWS Lambda-based setup into a fully containerized Kubernetes deployment.
-
----
-
-## 🚀 Tech Stack
-
-**Backend:** Java, Spring Boot, Dagger  
-**Frontend:** React.js (hosted on S3)  
-**Database:** DynamoDB → Migrated to MongoDB  
-**Authentication:** Cognito → Migrated to Spring Security with JWT  
-**Cloud Services:** AWS Lambda, API Gateway, SES, SQS, CloudWatch  
-**Deployment:** Kubernetes, ArgoCD, KubeRocketCI  
-**Routing & Load Balancing:** Kubernetes Ingress  
-**Email Reporting:** AWS SES, Scheduled with Spring `@Scheduled` and cron  
-**CI/CD:** GitLab, KubeRocketCI, ArgoCD (GitOps)
+**Green and Tasty** is a full-featured, cloud-native restaurant booking and management system designed to automate workflows, optimize staff allocation, and improve customer experiences across multiple restaurant locations. What began as an AWS serverless system is now evolving into a containerized, microservices-driven architecture running on Kubernetes with GitOps integration.
 
 ---
 
-## 🧠 Architecture Overview
+## 🚀 Key Highlights
 
-Initially built with AWS Lambda for cost-efficiency, the system is now undergoing a migration to Kubernetes, where each service — including the core backend and reporting service — runs inside its own pod. Ingress is used for internal routing and load balancing across microservices.
-
-ArgoCD enables GitOps-based deployment, and KubeRocketCI handles container image builds and promotions. The backend is fully modularized, with dedicated services for user management, reservations, feedback, and reporting.
-
----
-
-## 🔑 Key Features
-
-- 🔐 **Spring Security-based authentication**, replacing AWS Cognito
-- 🍽️ **Dynamic table booking** with waiter-level visibility
-- 👥 **Role-based access control** for customers, waiters, and admins
-- 📨 **Automated report mailing** to managers via AWS SES using scheduled cron jobs
-  - Generates CSV from reports table
-  - Sends over email using SES
-- 🧾 **Feedback management system** – post, retrieve, and sort by rating/date
-- 🧠 **Microservice architecture** – feedback, booking, menu, reporting etc.
-- 📋 **Menu browsing & filtering** per restaurant location
-- ⚖️ **Workload-based waiter assignment** algorithm for efficiency
-- 🌐 **Ingress-based routing & service exposure in Kubernetes**
+- 📦 Migrated from AWS Lambda-based monolith to **Kubernetes-based microservices**
+- 🔄 CI/CD powered by **KubeRocketCI** and **ArgoCD** for GitOps-driven deployments
+- 🧠 Designed using solid **System Design principles** with real-world implementation
+- 💡 Modular architecture: Auth, Reservation, Feedback, Reporting, Menu, Users
+- 🌍 Frontend (React) and Reporting Service now running in isolated pods behind Ingress
 
 ---
 
-## ⚙️ System Evolution
+## 🛠️ Tech Stack
 
-- ✅ Migrated from **DynamoDB to MongoDB** for flexible schema support
-- ✅ Migrated **authentication** from AWS Cognito to in-house **Spring Security** with token-based auth
-- ✅ Moved from Lambda-based monolith to **Kubernetes microservices**
-- ✅ Introduced **ArgoCD** and **KubeRocketCI** for GitOps-based CI/CD
-- ✅ Deployed services using **Ingress** for intelligent routing & load balancing
+**Languages & Frameworks:**  
+Java, Spring Boot, Spring Security, Dagger, React.js
 
----
+**Cloud & Infrastructure:**  
+AWS (Lambda, API Gateway, S3, SES, SQS, DynamoDB), Kubernetes, GitLab CI, KubeRocketCI, ArgoCD, Ingress Controller
 
-## 🛠️ How to Run (Coming Soon)
+**Databases:**  
+DynamoDB → Migrated to MongoDB
 
-A Helm chart & deployment guide will be provided for spinning up the full Kubernetes stack locally using Minikube or on any cloud-native cluster.
-
----
-
-## 📬 Contact
-
-Created and maintained by **Chintamani Chourase**  
-📧 chintamanichourase@gmail.com  
-🌐 [LinkedIn](https://www.linkedin.com/in/chintamani-chourase-43964122b/)  
-🧠 Always open to collaboration and contributions!
+**Authentication:**  
+Cognito → Migrated to Spring Security with JWT
 
 ---
 
-## 🏁 Status
+## 📐 Architecture Overview
 
-✅ Actively maintained and expanding  
-🔜 More microservices (payment, analytics, queue system) under development  
-📊 Enhanced observability and Prometheus/Grafana integration coming soon
+Originally built on AWS using Lambda, API Gateway, and Cognito for fast prototyping and cost efficiency, the platform has now transitioned to a scalable Kubernetes environment. Each core component — authentication, reservation, reporting, feedback, etc. — runs as an isolated microservice within Kubernetes pods, managed by ArgoCD and exposed via Ingress for seamless internal and external routing.
+
+Reporting service generates scheduled CSV reports from MongoDB using Spring’s `@Scheduled(cron)` and delivers them to managers via AWS SES.
 
 ---
 
+## 🔑 Features
+
+- 🔐 **Spring Security-based Auth System** (replacing Cognito)
+- 🧾 **Smart Table Reservation** with 90-min slot + 15-min buffer logic
+- 🤖 **Workload-based Waiter Assignment** to prevent imbalance
+- ✨ **Dynamic Feedback System** – food & service rated independently
+- 🗃️ **MongoDB-backed reporting service** with cron-based SES mail triggers
+- 📦 **Pre-order system** for waiters and customers
+- 📈 **Real-time analytics engine** tracking user experience & operational KPIs
+- 📋 **Role-based Dashboards** for Customer, Waiter, and Visitor access
+- 🌐 **Ingress-based routing** for scalable pod communication
+
+---
+
+## 🔄 Recent Enhancements
+
+- ✅ Migrated Authentication from **Cognito → Spring Security**
+- ✅ Migrated Database from **DynamoDB → MongoDB**
+- ✅ Deployed core services into **Kubernetes Pods**
+- ✅ Implemented **Ingress** for load balancing and routing
+- ✅ Added **Scheduled Reporting Service** with SES + CSV export
+- ✅ CI/CD Pipeline built with **KubeRocketCI** and GitOps with **ArgoCD**
+
+---
+
+## 📊 Future Enhancements
+
+- 📱 Native mobile app with push notifications & location-based features  
+- 🧠 AI-based reservation suggestions & dynamic pricing  
+- 💳 Integration with payment gateways & loyalty systems  
+- 🌍 Multi-language and multi-currency support  
+- 📈 Advanced dashboards for behavior and sales analytics  
+- 🌱 Sustainability insights: food waste & energy monitoring
+
+---
+
+## 📁 Project Structure
+
+```bash
+├── auth-service/
+├── reservation-service/
+├── feedback-service/
+├── reporting-service/         # Uses cron to email reports via SES
+├── gateway-service/           # Handles ingress rules
+├── frontend/                  # React app hosted on S3
+├── k8s/                       # Deployment YAMLs for all services
+├── .gitlab-ci.yml             # KubeRocketCI pipeline
+└── README.md
