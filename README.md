@@ -77,12 +77,8 @@ Reporting service generates scheduled CSV reports from MongoDB using Spring’s 
 ## 📁 Project Structure
 
 ```bash
-├── auth-service/
-├── reservation-service/
-├── feedback-service/
+├── restaurant-api/
 ├── reporting-service/         # Uses cron to email reports via SES
-├── gateway-service/           # Handles ingress rules
-├── frontend/                  # React app hosted on S3
 ├── k8s/                       # Deployment YAMLs for all services
 ├── .gitlab-ci.yml             # KubeRocketCI pipeline
 └── README.md
