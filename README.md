@@ -62,7 +62,10 @@ Reporting service generates scheduled CSV reports from MongoDB using Spring’s 
 - ✅ CI/CD Pipeline built with **KubeRocketCI** and GitOps with **ArgoCD**
 
 ---
+## 📐 Component Diagram: Before and After Migration
 
+### **Before Migration**
+!(Untitled design (3) 4.png)
 ## 📊 Future Enhancements
 
 - 📱 Native mobile app with push notifications & location-based features  
