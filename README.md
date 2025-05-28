@@ -65,7 +65,7 @@ Reporting service generates scheduled CSV reports from MongoDB using Spring’s 
 ## 📐 Component Diagram: Before and After Migration
 
 ### **Before Migration**
-![Before Migration Diagram](before.png)
+<img src="before.png" alt="Before Migration Diagram" width="600" />
 
 ### **After Migration**
 ![After Migration Diagram](after.png)
